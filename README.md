@@ -25,24 +25,37 @@ QuickHire is a simple Node.js-based job board web application. It allows users t
 
 ##  Folder Structure
 
-├── database/ # Database setup and connection
-│ └── database.js
-├── public/ # Public static files (scripts and styles)
-│ ├── app.js
-│ ├── auth_handler.js
-│ ├── dashboard_handler.js
-│ ├── auth-styles.css
-│ └── styles.css
-├── views/ # HTML pages
-│ ├── login.html
-│ ├── register.html
-│ └── dashboard.html
-├── .env # Environment variables (e.g., PORT)
-├── Dockerfile # Docker container configuration
-├── server.js # Main server file (Node.js, no Express)
-├── quickhire.db # SQLite database file
-├── package.json # NPM dependencies
-└── README.md # Project documentation
+DianeINGABIRE-alu-Quick-Hire/
+│
+├── database/                   # Database setup
+│   └── database.js
+│
+├── public/                     # Static assets
+│   ├── css/
+│   │   ├── auth.css
+│   │   └── main.css
+│   ├── js/
+│   │   ├── app.js
+│   │   ├── auth_handler.js
+│   │   └── dashboard_handler.js
+│   └── images/                 # Add this if you use logos/icons
+│       └── logo.png
+│
+├── views/                      # HTML files
+│   ├── login.html
+│   ├── register.html
+│   └── dashboard.html
+│
+├── .env                        # Environment config
+├── .gitignore                  # Git ignore file
+├── Dockerfile                  # Docker configuration
+├── docker-compose.yml          # Optional: DB + app setup
+├── server.js                   # Main server file (no Express)
+├── quickhire.db                # SQLite database
+├── package.json
+├── package-lock.json
+└── README.md                   # Project info, YouTube + Deployment links
+
 
 
 ##  Getting Started (Locally)
