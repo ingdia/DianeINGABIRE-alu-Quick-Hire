@@ -126,3 +126,5 @@ body.modal-open .modal { transform: translate(-50%, -50%) scale(1); }
   .mobile-sidebar-toggle { display: block; position: fixed; top: 15px; left: 15px; z-index: 1005; background: var(--card-bg); border: none; border-radius: 8px; font-size: 1.5rem; padding: 5px 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: var(--dark-text); }
   .main-content { padding: 20px; padding-top: 80px; }
 }
+
+

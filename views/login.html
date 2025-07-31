@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-g" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
-    <link rel="stylesheet" href="/style.css" />
+    <!-- Your existing stylesheet link -->
+    <link rel="stylesheet" href="/public/auth-styles.css" />
   </head>
   <body>
     <div class="form-container">
       <form action="/login" method="POST">
         <h2>Welcome Back!</h2>
         <div class="form-group">
-          <label for="email">Email Address</label
-          ><input type="email" id="email" name="email" required />
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required />
         </div>
         <div class="form-group">
-          <label for="password">Password</label
-          ><input type="password" id="password" name="password" required />
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
         </div>
         <button type="submit" class="btn">Login</button>
         <div class="form-footer">
@@ -24,5 +25,12 @@
         </div>
       </form>
     </div>
+
+    <!-- ===== 1. ADD THIS DIV FOR THE TOAST NOTIFICATION ===== -->
+    <div id="toast-notification" class="toast"></div>
+
+    <!-- ===== 2. ADD THIS SCRIPT TAG AT THE VERY BOTTOM ===== -->
+    <!-- This will handle the form submission without a page refresh -->
+    <script src="/public/auth_handler.js"></script>
   </body>
 </html>
