@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QuickHire - User Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- New class will be added here by JS for collapsing -->
+  <div class="dashboard-wrapper" id="dashboard-wrapper">
+
+    <!-- =========== SIDEBAR =========== -->
+    <aside class="sidebar" id="sidebar">
+      <div>
+        <div class="user-profile">
+          <img src="https://i.pravatar.cc/100" alt="User Avatar" />
+          <!-- Text is wrapped in a span to be hidden -->
+          <span class="user-details">
+            <h2>Diane Ingabire</h2>
+            <p>Active Job Seeker</p>
+          </span>
+        </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <!-- data-target attribute links nav items to content sections -->
+            <li><a href="#" class="active" data-target="dashboard-content"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+            <li><a href="#" data-target="saved-jobs-content"><i class="fas fa-bookmark"></i><span>Saved Jobs</span></a></li>
+            <li><a href="#" data-target="applications-content"><i class="fas fa-paper-plane"></i><span>Applications</span></a></li>
+            <li><a href="#" data-target="settings-content"><i class="fas fa-cog"></i><span>Settings</span></a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="sidebar-footer">
+        <!-- NEW: Sidebar Collapse Button -->
+        <button id="sidebar-collapse-btn" class="sidebar-collapse-btn">
+          <i class="fas fa-chevron-left"></i>
+          <span>Collapse</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- =========== MAIN CONTENT =========== -->
+    <main class="main-content">
+      <button id="mobile-sidebar-toggle" class="mobile-sidebar-toggle"><i class="fas fa-bars"></i></button>
+
+      <!-- All page content will be rendered inside these containers -->
+      <div id="dashboard-content" class="content-section active">
+        <!-- Dashboard content (header, grid) goes here -->
+      </div>
+      <div id="saved-jobs-content" class="content-section">
+        <!-- Saved jobs content goes here -->
+      </div>
+      <div id="applications-content" class="content-section">
+        <!-- Applications content goes here -->
+      </div>
+      <div id="settings-content" class="content-section">
+        <!-- Settings form goes here -->
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL (No Changes) -->
+  <div id="job-modal-overlay" class="modal-overlay"></div>
+  <div id="job-modal" class="modal">
+    <div class="modal-header"><h2 id="modal-job-title">Job Title</h2><button id="modal-close-btn" class="modal-close-btn">×</button></div>
+    <div class="modal-body"><div class="modal-company-info"><img id="modal-employer-logo" src="" alt="Company Logo"><div><h3 id="modal-employer-name">Company Name</h3><p id="modal-job-location">Location</p></div></div><h4>Qualifications:</h4><ul id="modal-qualifications"></ul><h4>Responsibilities:</h4><p id="modal-responsibilities"></p></div>
+    <div class="modal-footer"><a id="modal-apply-btn" href="#" target="_blank" class="btn">Apply Now</a></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
