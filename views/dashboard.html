@@ -1,74 +1,97 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>QuickHire - User Dashboard</title>
+
+  <!-- External Font Awesome library for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Link to your main dashboard stylesheet -->
   <link rel="stylesheet" href="/public/styles.css" />
 </head>
 <body>
-  <!-- New class will be added here by JS for collapsing -->
   <div class="dashboard-wrapper" id="dashboard-wrapper">
 
     <!-- =========== SIDEBAR =========== -->
     <aside class="sidebar" id="sidebar">
       <div>
+        <!-- REFINED: User profile with IDs for personalization -->
         <div class="user-profile">
-          <img src="https://i.pravatar.cc/100" alt="User Avatar" />
-          <!-- Text is wrapped in a span to be hidden -->
-          <span class="user-details">
-            <h2>Diane Ingabire</h2>
-            <p>Active Job Seeker</p>
-          </span>
+          <img src="https://i.imgur.com/DNLN3Q1.png" alt="User Avatar" class="user-avatar" />
+          <div class="user-info">
+            <!-- These spans will be filled by app.js -->
+            <span class="user-name" id="user-profile-name">Loading...</span>
+            <span class="user-email" id="user-profile-email"></span>
+          </div>
         </div>
+        
+        <!-- REFINED: Navigation structure matches your app.js -->
         <nav class="sidebar-nav">
-          <ul>
-            <!-- data-target attribute links nav items to content sections -->
-            <li><a href="#" class="active" data-target="dashboard-content"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
-            <li><a href="#" data-target="saved-jobs-content"><i class="fas fa-bookmark"></i><span>Saved Jobs</span></a></li>
-            <li><a href="#" data-target="applications-content"><i class="fas fa-paper-plane"></i><span>Applications</span></a></li>
-            <li><a href="#" data-target="settings-content"><i class="fas fa-cog"></i><span>Settings</span></a></li>
-          </ul>
+          <a href="#" class="active" data-target="dashboard-content"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+          <a href="#" data-target="saved-jobs-content"><i class="fas fa-bookmark"></i><span>Saved Jobs</span></a>
+          <a href="#" data-target="applications-content"><i class="fas fa-file-alt"></i><span>My Applications</span></a>
+          <a href="#" data-target="settings-content"><i class="fas fa-cog"></i><span>Settings</span></a>
         </nav>
       </div>
+
       <div class="sidebar-footer">
-        <!-- NEW: Sidebar Collapse Button -->
-        <button id="sidebar-collapse-btn" class="sidebar-collapse-btn">
-          <i class="fas fa-chevron-left"></i>
-          <span>Collapse</span>
-        </button>
+       
+
+        <!-- REFINED: Collapse button and a functional Logout link -->
+        <div class="sidebar-actions">
+           <a href="/logout" class="sidebar-logout-btn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+           <button id="sidebar-collapse-btn" class="sidebar-collapse-btn"><i class="fas fa-chevron-left"></i></button>
+        </div>
       </div>
     </aside>
 
     <!-- =========== MAIN CONTENT =========== -->
     <main class="main-content">
-      <button id="mobile-sidebar-toggle" class="mobile-sidebar-toggle"><i class="fas fa-bars"></i></button>
+      <header class="mobile-header">
+        <button id="mobile-sidebar-toggle"><i class="fas fa-bars"></i></button>
+        <span class="mobile-logo">QuickHire</span>
+      </header>
 
-      <!-- All page content will be rendered inside these containers -->
-      <div id="dashboard-content" class="content-section active">
-        <!-- Dashboard content (header, grid) goes here -->
-      </div>
-      <div id="saved-jobs-content" class="content-section">
-        <!-- Saved jobs content goes here -->
-      </div>
-      <div id="applications-content" class="content-section">
-        <!-- Applications content goes here -->
-      </div>
-      <div id="settings-content" class="content-section">
-        <!-- Settings form goes here -->
-      </div>
+      <!-- The empty containers that app.js will dynamically fill -->
+      <div id="dashboard-content" class="content-section active"></div>
+      <div id="saved-jobs-content" class="content-section"></div>
+      <div id="applications-content" class="content-section"></div>
+      <div id="settings-content" class="content-section"></div>
     </main>
   </div>
 
-  <!-- MODAL (No Changes) -->
-  <div id="job-modal-overlay" class="modal-overlay"></div>
+  <!-- MODAL (This structure is correct) -->
+  <div id="job-modal-overlay"></div>
   <div id="job-modal" class="modal">
-    <div class="modal-header"><h2 id="modal-job-title">Job Title</h2><button id="modal-close-btn" class="modal-close-btn">×</button></div>
-    <div class="modal-body"><div class="modal-company-info"><img id="modal-employer-logo" src="" alt="Company Logo"><div><h3 id="modal-employer-name">Company Name</h3><p id="modal-job-location">Location</p></div></div><h4>Qualifications:</h4><ul id="modal-qualifications"></ul><h4>Responsibilities:</h4><p id="modal-responsibilities"></p></div>
-    <div class="modal-footer"><a id="modal-apply-btn" href="#" target="_blank" class="btn">Apply Now</a></div>
+    <div class="modal-header">
+      <h3 id="modal-job-title">Job Title</h3>
+      <button id="modal-close-btn">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-company-info">
+        <img id="modal-employer-logo" src="" alt="Company Logo">
+        <div>
+          <p id="modal-employer-name">Employer Name</p>
+          <span id="modal-job-location">Location</span>
+        </div>
+      </div>
+      <h4>Qualifications:</h4>
+      <ul id="modal-qualifications"></ul>
+      <h4>Responsibilities:</h4>
+      <p id="modal-responsibilities"></p>
+    </div>
+    <div class="modal-footer">
+      <a href="#" id="modal-apply-btn" class="btn" target="_blank" rel="noopener noreferrer">Apply Now</a>
+    </div>
   </div>
 
+  <!-- ADDED: A placeholder for toast notifications -->
+  <div id="toast-notification" class="toast"></div>
+
+  <!-- SCRIPT TAGS (Ensure both are present) -->
   <script src="/public/app.js"></script>
+  <script src="/public/dashboard_handler.js"></script>
 </body>
 </html>

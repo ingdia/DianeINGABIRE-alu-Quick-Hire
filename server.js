@@ -1,4 +1,4 @@
-// File: server.js (Refined for Clarity and Public Asset Handling)
+// File: server.js
 
 require('dotenv').config();
 
@@ -9,10 +9,13 @@ const querystring = require('querystring');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const db = require('./database/database');
+const fetch = require('node-fetch');
 
+// In-memory session store. A real application would use a database like Redis.
 const sessions = {};
 
-// --- Helper Functions (No changes needed) ---
+// --- HELPER FUNCTIONS ---
+
 function serveStaticFile(filePath, contentType, res) {
     const fullPath = path.join(__dirname, filePath);
     fs.readFile(fullPath, (err, data) => {
@@ -49,37 +52,27 @@ function verifyPassword(password, storedHash) {
 }
 
 
-const server = http.createServer((req, res) => {
+// --- MAIN HTTP SERVER ---
+
+const server = http.createServer(async (req, res) => {
     const { method, url } = req;
     const cookies = querystring.parse(req.headers.cookie, '; ');
     const sessionID = cookies.sessionID;
     const userEmail = sessions[sessionID];
 
+    // Log every incoming request for easier debugging
     console.log(`[${new Date().toISOString()}] ${method} ${url}`);
 
     // --- GET REQUEST ROUTER ---
     if (method === 'GET') {
-        // Route for main pages
+        // Serve main HTML pages
         if (url === '/login') return serveStaticFile('views/login.html', 'text/html', res);
         if (url === '/register') return serveStaticFile('views/register.html', 'text/html', res);
 
-        // Route for dashboard access control
-        if (url === '/' || url === '/dashboard') {
-            if (userEmail) return serveStaticFile('views/dashboard.html', 'text/html', res);
-            // If not logged in, redirect to login page
-            res.writeHead(302, { 'Location': '/login' });
-            return res.end();
-        }
-
-        // --- REFINED ASSET ROUTE ---
-        // This single block handles all public assets:
-        // /public/auth-styles.css
-        // /public/styles.css
-        // /public/app.js
-        // etc.
+        // Serve all static assets (CSS, Frontend JS) from the /public directory
         if (url.startsWith('/public/')) {
             const filePath = path.join(__dirname, url);
-            let contentType = 'text/plain'; // Default content type
+            let contentType = 'text/plain';
             if (url.endsWith('.css')) contentType = 'text/css';
             if (url.endsWith('.js')) contentType = 'application/javascript';
             
@@ -92,25 +85,87 @@ const server = http.createServer((req, res) => {
                 res.writeHead(200, { 'Content-Type': contentType });
                 res.end(data);
             });
-            return; // Important: Stop execution after handling the asset
+            return;
         }
         
-        // --- ADDED: Simple Logout Route ---
-        if (url === '/logout') {
-            if(sessionID) {
-                delete sessions[sessionID]; // Remove the session from our memory
+        // Protect the dashboard route
+        if (url === '/' || url === '/dashboard') {
+            if (userEmail) return serveStaticFile('views/dashboard.html', 'text/html', res);
+            res.writeHead(302, { 'Location': '/login' });
+            return res.end();
+        }
+
+        // Secure Backend API Proxy for Jooble
+        if (url.startsWith('/api/jobs')) {
+            if (!userEmail) {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ message: 'Unauthorized. Please log in first.' }));
             }
-            // Expire the cookie and redirect to login
+
+            const joobleApiKey = process.env.JOOBLE_API_KEY;
+            if (!joobleApiKey) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ message: 'Jooble API Key not configured on the server.' }));
+            }
+
+            const requestUrl = new URL(req.url, `http://${req.headers.host}`);
+            const query = requestUrl.searchParams.get('query') || 'Project Manager';
+            
+            const joobleApiUrl = 'https://jooble.org/api/' + joobleApiKey;
+            const joobleRequestOptions = {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ keywords: query })
+            };
+
+            try {
+                const apiResponse = await fetch(joobleApiUrl, joobleRequestOptions);
+                const joobleData = await apiResponse.json();
+
+                // Translate Jooble's data structure to the one our frontend expects
+                const mappedJobs = (joobleData.jobs || []).map(job => ({
+                    job_id: job.link,
+                    job_title: job.title,
+                    employer_name: job.company,
+                    employer_logo: 'https://i.imgur.com/DNLN3Q1.png', // Default logo
+                    job_city: job.location,
+                    job_employment_type: job.type || 'Full-time',
+                    job_apply_link: job.link,
+                    job_description: job.snippet,
+                    job_highlights: { Qualifications: [], Responsibilities: [] }
+                }));
+                
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ data: mappedJobs })); // Wrap in 'data' property
+            } catch (error) {
+                console.error('Jooble API Proxy Error:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: 'Failed to fetch data from Jooble API.' }));
+            }
+            return;
+        }
+
+        // +++ ADDED: Secure API Route to get the current user's profile info +++
+        if (url === '/api/me') {
+            if (!userEmail) {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ success: false, message: 'Not authenticated' }));
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: true, email: userEmail }));
+            return;
+        }
+
+        // Functional logout route
+        if (url === '/logout') {
+            if (sessionID) delete sessions[sessionID];
             res.writeHead(302, {
-                'Set-Cookie': `sessionID=; HttpOnly; Path=/; Max-Age=0`,
+                'Set-Cookie': 'sessionID=; HttpOnly; Path=/; Max-Age=0',
                 'Location': '/login'
             });
             return res.end();
         }
-        
-        // Fallback for any other GET request that wasn't handled
-        // res.writeHead(404);
-        // res.end('Page Not Found');
     }
 
     // --- POST REQUEST ROUTER ---
@@ -118,7 +173,6 @@ const server = http.createServer((req, res) => {
         let body = '';
         req.on('data', chunk => body += chunk.toString());
         req.on('end', async () => {
-            
             let formData;
             const contentType = req.headers['content-type'];
 
@@ -137,8 +191,7 @@ const server = http.createServer((req, res) => {
             res.setHeader('Content-Type', 'application/json');
 
             if (url === '/register') {
-                // Your register logic here... (it's correct)
-                 try {
+                try {
                     if (!formData.email || !formData.password) {
                         res.statusCode = 400;
                         return res.end(JSON.stringify({ success: false, message: 'Email and password are required.' }));
@@ -155,12 +208,10 @@ const server = http.createServer((req, res) => {
                 } catch (err) {
                     console.error('Registration error:', err);
                     res.statusCode = 500;
-                    res.end(JSON.stringify({ success: false, message: 'Server error.' }));
+                    res.end(JSON.stringify({ success: false, message: 'Server error during registration.' }));
                 }
-
             } else if (url === '/login') {
-                 // Your login logic here... (it's correct)
-                 try {
+                try {
                     if (!formData.email || !formData.password) {
                         res.statusCode = 400;
                         return res.end(JSON.stringify({ success: false, message: 'Email and password are required.' }));
@@ -178,7 +229,7 @@ const server = http.createServer((req, res) => {
                 } catch (err) {
                     console.error('Login error:', err);
                     res.statusCode = 500;
-                    res.end(JSON.stringify({ success: false, message: 'Server error.' }));
+                    res.end(JSON.stringify({ success: false, message: 'Server error during login.' }));
                 }
             } else {
                 res.statusCode = 404;
