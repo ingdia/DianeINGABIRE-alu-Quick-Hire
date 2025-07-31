@@ -1,64 +1,60 @@
-// File: public/auth_handler.js
+// File: public/auth_handler.js (Refined to handle both Login and Register)
 
 document.addEventListener('DOMContentLoaded', () => {
+    // --- LOGIN FORM HANDLER ---
     const loginForm = document.querySelector('form[action="/login"]');
-
     if (loginForm) {
-        loginForm.addEventListener('submit', async (event) => {
-            // Stop the form from doing a default page refresh
-            event.preventDefault();
-
-            const formData = new FormData(loginForm);
-            const data = Object.fromEntries(formData.entries());
-
-            try {
-                // Send the form data to the server in the background
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // If login was successful, the server tells us where to go
-                    window.location.href = result.redirectUrl;
-                } else {
-                    // If there was an error, show the toast with the message
-                    showToast(result.message, true); // true means it's an error
-                }
-            } catch (error) {
-                // Handle network errors (e.g., server is down)
-                showToast('A network error occurred. Please try again.', true);
-            }
+        loginForm.addEventListener('submit', (event) => {
+            // We pass the form and the URL to a generic handler function
+            handleAuthForm(event, loginForm, '/login');
         });
     }
 
-    // You can add similar logic for the registration form here if you want!
+    // --- REGISTER FORM HANDLER (NEW!) ---
+    const registerForm = document.querySelector('form[action="/register"]');
+    if (registerForm) {
+        registerForm.addEventListener('submit', (event) => {
+            handleAuthForm(event, registerForm, '/register');
+        });
+    }
 });
 
-// A helper function to show the toast notification
+// A generic function to handle submission for any auth form
+async function handleAuthForm(event, formElement, postUrl) {
+    // 1. STOP the default browser refresh
+    event.preventDefault();
+
+    const formData = new FormData(formElement);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+        // 2. SEND data in the background
+        const response = await fetch(postUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        // 3. HANDLE the server's response
+        if (result.success) {
+            // If successful, redirect to the URL the server provides
+            window.location.href = result.redirectUrl;
+        } else {
+            // If there's an error, show the toast
+            showToast(result.message, true);
+        }
+    } catch (error) {
+        showToast('A network error occurred. Please try again.', true);
+    }
+}
+
+// Helper function to show toasts (no changes needed here)
 function showToast(message, isError = true) {
     const toast = document.getElementById('toast-notification');
     if (!toast) return;
-
     toast.textContent = message;
-    
-    // Add or remove the 'success' class for different colors
-    if (isError) {
-        toast.classList.remove('success');
-    } else {
-        toast.classList.add('success');
-    }
-
-    // Make the toast visible
-    toast.classList.add('show');
-
-    // Hide the toast after 3 seconds
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
+    toast.className = isError ? 'toast show error' : 'toast show success';
+    setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
 }
