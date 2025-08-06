@@ -21,43 +21,6 @@ QuickHire is a simple Node.js-based job board web application. It allows users t
 - **Database:** SQLite (via `quickhire.db`)
 - **Containerization:** Docker
 
----
-
-##  Folder Structure
-
-DianeINGABIRE-alu-Quick-Hire/
-│
-├── database/                   # Database setup
-│   └── database.js
-│
-├── public/                     # Static assets
-│   ├── css/
-│   │   ├── auth.css
-│   │   └── main.css
-│   ├── js/
-│   │   ├── app.js
-│   │   ├── auth_handler.js
-│   │   └── dashboard_handler.js
-│   └── images/                 # Add this if you use logos/icons
-│       └── logo.png
-│
-├── views/                      # HTML files
-│   ├── login.html
-│   ├── register.html
-│   └── dashboard.html
-│
-├── .env                        # Environment config
-├── .gitignore                  # Git ignore file
-├── Dockerfile                  # Docker configuration
-├── docker-compose.yml          # Optional: DB + app setup
-├── server.js                   # Main server file (no Express)
-├── quickhire.db                # SQLite database
-├── package.json
-├── package-lock.json
-└── README.md                   # Project info, YouTube + Deployment links
-
-
-
 ##  Getting Started (Locally)
 
 ### 1. Clone the repository
@@ -70,7 +33,7 @@ npm install
 3. Configure environment
 Create a .env file:
 
-## 📺 Demo Video
+##  Demo Video
 
 Watch a short 2-minute demo on YouTube:  
  [![Watch on YouTube](https://img.shields.io/badge/Watch-Demo-red?logo=youtube)](https://youtu.be/KNNZ-KkE1Ig)
